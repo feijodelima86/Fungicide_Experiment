@@ -1,97 +1,11 @@
 library(readr)
 
-
 # Analysis of C/P Ratio with Acetone Adjustment
 
 # Read the data
-data <- read.csv(text = 'Sample,Group,Day,Fungi_Est,Acet_Est,CP_ratio
-a1,1,3,0,0,0.133333
-a2,1,3,0,0,0.2
-a3,1,3,0,0,0.1875
-b1,2,3,0,100,0.157895
-b7,2,3,0,100,0.190476
-c4,2,3,0,100,0.166667
-b2,3,3,0.01,0.01,0.166667
-b8,3,3,0.01,0.01,0.217391
-c5,3,3,0.01,0.01,0.153846
-b3,4,3,0.1,0.1,0.15
-b9,4,3,0.1,0.1,0.190476
-c6,4,3,0.1,0.1,0.176471
-b4,5,3,1,1,0.166667
-c1,5,3,1,1,0.157895
-c7,5,3,1,1,0.2
-b5,6,3,10,10,0.142857
-c2,6,3,10,10,0.25
-c8,6,3,10,10,0.157895
-b6,7,3,100,100,0.136364
-c3,7,3,100,100,0.166667
-c9,7,3,100,100,0.176471
-a1,1,5,0,0,0.15
-a2,1,5,0,0,0.181818
-a3,1,5,0,0,0.111111
-b1,2,5,0,100,0.2
-b7,2,5,0,100,0.235294
-c4,2,5,0,100,0.263158
-b2,3,5,0.01,0.01,0.227273
-b8,3,5,0.01,0.01,0.190476
-c5,3,5,0.01,0.01,0.222222
-b3,4,5,0.1,0.1,0.176471
-b9,4,5,0.1,0.1,0.208333
-c6,4,5,0.1,0.1,0.185185
-b4,5,5,1,1,0.176471
-c1,5,5,1,1,0.2
-c7,5,5,1,1,0.181818
-b5,6,5,10,10,0.157895
-c2,6,5,10,10,0.16
-c8,6,5,10,10,0.176471
-b6,7,5,100,100,0.133333
-c3,7,5,100,100,0.125
-c9,7,5,100,100,0.210526
-a1,1,7,0,0,0.25
-a2,1,7,0,0,0.25
-a3,1,7,0,0,0.238095
-b1,2,7,0,100,0.266667
-b7,2,7,0,100,0.3
-c4,2,7,0,100,0.333333
-b2,3,7,0.01,0.01,0.272727
-b8,3,7,0.01,0.01,0.25
-c5,3,7,0.01,0.01,0.294118
-b3,4,7,0.1,0.1,0.166667
-b9,4,7,0.1,0.1,0.1875
-c6,4,7,0.1,0.1,0.2
-b4,5,7,1,1,0.2
-c1,5,7,1,1,0.157895
-c7,5,7,1,1,0.166667
-b5,6,7,10,10,0.166667
-c2,6,7,10,10,0.173913
-c8,6,7,10,10,0.166667
-b6,7,7,100,100,0.133333
-c3,7,7,100,100,0.157895
-c9,7,7,100,100,0.181818
-a1,1,10,0,0,0.3
-a2,1,10,0,0,0.333333
-a3,1,10,0,0,0.285714
-b1,2,10,0,100,0.384615
-b7,2,10,0,100,0.333333
-c4,2,10,0,100,0.357143
-b2,3,10,0.01,0.01,0.285714
-b8,3,10,0.01,0.01,0.285714
-c5,3,10,0.01,0.01,0.307692
-b3,4,10,0.1,0.1,0.285714
-b9,4,10,0.1,0.1,0.285714
-c6,4,10,0.1,0.1,0.277778
-b4,5,10,1,1,0.363636
-c1,5,10,1,1,0.25
-c7,5,10,1,1,0.181818
-b5,6,10,10,10,0.307692
-c2,6,10,10,10,0.181818
-c8,6,10,10,10,0.263158
-b6,7,10,100,100,0.384615
-c3,7,10,100,100,0.272727
-c9,7,10,100,100,0.266667')
+data <- read.csv("~/GIT_Projects/Fungicide_Experiment/0_Data/Data_Merged.csv")
 
-
-data
+names(data)
 
 # Map group numbers to treatment names
 treatment_map <- c(
@@ -112,13 +26,10 @@ data$Day <- as.numeric(as.character(data$Day))
 
 # Verify the loaded data
 head(data)
-cat("\nData structure:\n")
 str(data)
-cat("\nSummary of C/P ratio:\n")
-summary(data$CP_ratio)
+summary(data$C.P.ratio)
 
 # Check the number of samples per treatment and day
-cat("\nSamples per treatment and day:\n")
 print(table(data$Treatment, data$Day))
 
 # Step 1: Estimate acetone effect from controls
@@ -126,18 +37,16 @@ print(table(data$Treatment, data$Day))
 controls_data <- data[data$Treatment %in% c("Control1", "Control2"), ]
 controls_data$is_acetone <- ifelse(controls_data$Treatment == "Control2", 1, 0)
 
-acetone_model <- glm(CP_ratio ~ Day + is_acetone, 
+acetone_model <- glm(C.P.ratio ~ Day + is_acetone, 
                      data = controls_data, 
                      family = gaussian())
 
 plot(acetone_model)
 
-cat("\nAcetone effect model summary:\n")
 print(summary(acetone_model))
 
 # Extract the acetone effect (per 100% concentration)
 acetone_effect_estimate <- coef(acetone_model)["is_acetone"]
-cat("\nEstimated effect of 100% acetone:", acetone_effect_estimate, "\n")
 
 # Step 2: Create proportional acetone effects
 # The acetone concentrations for each treatment
@@ -153,37 +62,34 @@ acetone_conc <- c(
 
 # Calculate expected acetone effect for each treatment based on concentration
 data$expected_acetone_effect <- (acetone_conc[data$Treatment] / 100) * acetone_effect_estimate
-data$acetone_adjusted_CP_ratio <- data$CP_ratio - data$expected_acetone_effect
+data$acetone_adjusted_C.P.ratio <- data$C.P.ratio - data$expected_acetone_effect
 
 
 
 # Step 3: Run analysis on acetone-adjusted responses
-treatment_model <- glm(acetone_adjusted_CP_ratio ~ Day + Treatment + Acet_Est, 
+treatment_model <- glm(acetone_adjusted_C.P.ratio ~ Day + Treatment + Acet_Est, 
                        data = data, 
                        family = gaussian())
 
-cat("\nTreatment model (with acetone adjustment) summary:\n")
 print(summary(treatment_model))
 
 # Calculate means and standard errors for original and adjusted CP ratios
-mean_CP_ratio <- aggregate(CP_ratio ~ Treatment + Day, data = data, 
+mean_C.P.ratio <- aggregate(C.P.ratio ~ Treatment + Day, data = data, 
                            FUN = function(x) c(mean = mean(x), se = sd(x)/sqrt(length(x))))
-mean_CP_ratio <- do.call(data.frame, mean_CP_ratio)
-names(mean_CP_ratio)[3:4] <- c("mean_CP_ratio", "se_CP_ratio")
+mean_C.P.ratio <- do.call(data.frame, mean_C.P.ratio)
+names(mean_C.P.ratio)[3:4] <- c("mean_C.P.ratio", "se_C.P.ratio")
 
-mean_adjusted <- aggregate(acetone_adjusted_CP_ratio ~ Treatment + Day, data = data,
+mean_adjusted <- aggregate(acetone_adjusted_C.P.ratio ~ Treatment + Day, data = data,
                            FUN = function(x) c(mean = mean(x), se = sd(x)/sqrt(length(x))))
 mean_adjusted <- do.call(data.frame, mean_adjusted)
 names(mean_adjusted)[3:4] <- c("mean_adjusted", "se_adjusted")
 
 # View the means
-cat("\nOriginal CP Ratio means (sample):\n")
-print(head(mean_CP_ratio))
-cat("\nAcetone-adjusted CP Ratio means (sample):\n")
+print(head(mean_C.P.ratio))
 print(head(mean_adjusted))
 
 # For plotting - ensure treatments are ordered correctly
-mean_CP_ratio$Treatment <- factor(mean_CP_ratio$Treatment, 
+mean_C.P.ratio$Treatment <- factor(mean_C.P.ratio$Treatment, 
                                   levels = c("Control1", "Control2", 
                                              "Treatment1", "Treatment2", 
                                              "Treatment3", "Treatment4", 
@@ -266,7 +172,7 @@ create_treatment_plot <- function(data, y_var, se_var, y_label, main_title) {
 }
 
 # Plot 1: Original CP Ratio
-create_treatment_plot(mean_CP_ratio, "mean_CP_ratio", "se_CP_ratio", 
+create_treatment_plot(mean_C.P.ratio, "mean_C.P.ratio", "se_C.P.ratio", 
                       "C/P Ratio", "Original C/P Ratio by Treatment and Day")
 
 # Plot 2: Acetone-Adjusted CP Ratio
@@ -278,7 +184,7 @@ create_treatment_plot(mean_adjusted, "mean_adjusted", "se_adjusted",
 # Step 4: Compare to traditional ANCOVA and analyze dose-response relationship
 
 # Run traditional ANCOVA (without acetone adjustment)
-ancova_model <- glm(CP_ratio ~ Day + Treatment+ Acet_Est, 
+ancova_model <- glm(C.P.ratio ~ Day + Treatment+ Acet_Est, 
                     data = data, 
                     family = gaussian())
 
@@ -286,12 +192,12 @@ cat("\nTraditional ANCOVA model summary:\n")
 print(summary(ancova_model))
 
 # Compare AIC between approaches
-cat("\nModel comparison:\n")
-cat("AIC for traditional ANCOVA:", AIC(ancova_model), "\n")
-cat("AIC for treatment model with acetone adjustment:", AIC(treatment_model), "\n")
+AIC(ancova_model)
+AIC(treatment_model)
 
 # Optional: Analyze dose-response relationship for fungicide after acetone adjustment
 # First define fungicide concentrations for each treatment
+
 fungicide_conc <- c(
   "Control1" = 0,
   "Control2" = 0,
@@ -312,18 +218,17 @@ fungicide_data <- data[data$Fungi_Conc > 0, ]
 fungicide_data$log_fungi <- log10(fungicide_data$Fungi_Conc)
 
 # Model fungicide effect with log-transformed concentration
-fungicide_model <- glm(acetone_adjusted_CP_ratio ~ Day + log_fungi,
+fungicide_model <- glm(acetone_adjusted_C.P.ratio ~ Day + log_fungi,
                        data = fungicide_data,
                        family = gaussian())
 
-cat("\nFungicide dose-response model (log-transformed) summary:\n")
 print(summary(fungicide_model))
 
 # Create dose-response visualization for the final day
 final_day_data <- fungicide_data[fungicide_data$Day == max(fungicide_data$Day), ]
 
 # Calculate means and standard errors by fungicide concentration for the final day
-dose_response <- aggregate(acetone_adjusted_CP_ratio ~ Fungi_Conc, data = final_day_data,
+dose_response <- aggregate(acetone_adjusted_C.P.ratio ~ Fungi_Conc, data = final_day_data,
                            FUN = function(x) c(mean = mean(x), se = sd(x)/sqrt(length(x))))
 dose_response <- do.call(data.frame, dose_response)
 names(dose_response)[2:3] <- c("mean_response", "se_response")
@@ -395,12 +300,12 @@ analyze_time_trend <- function(treatment_name) {
   # Subset data for this treatment
   treat_data <- data[data$Treatment == treatment_name, ]
   
-  # Run linear model of CP_ratio over time
-  time_model <- lm(CP_ratio ~ Day, data = treat_data)
+  # Run linear model of C.P.ratio over time
+  time_model <- lm(C.P.ratio ~ Day, data = treat_data)
   
   # Run model for acetone-adjusted values
   if (treatment_name != "Control1") {  # Control1 has no acetone adjustment
-    adj_model <- lm(acetone_adjusted_CP_ratio ~ Day, data = treat_data)
+    adj_model <- lm(acetone_adjusted_C.P.ratio ~ Day, data = treat_data)
   } else {
     adj_model <- time_model  # Same for Control1
   }
@@ -505,7 +410,7 @@ data$log_fungi <- ifelse(data$Fungi_Est > 0, log10(data$Fungi_Est), NA)
 fungi_data <- data[!is.na(data$log_fungi), ]
 
 # Run model
-fungi_effect_model <- glm(acetone_adjusted_CP_ratio ~ Day + log_fungi, 
+fungi_effect_model <- glm(acetone_adjusted_C.P.ratio ~ Day + log_fungi, 
                           data = fungi_data, 
                           family = gaussian())
 
