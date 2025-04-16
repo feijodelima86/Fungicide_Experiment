@@ -27,7 +27,7 @@ data$Day <- as.numeric(as.character(data$Day))
 # Verify the loaded data
 head(data)
 str(data)
-summary(data$SiO2)
+summary(data$AI)
 
 # Check the number of samples per treatment and day
 print(table(data$Treatment, data$Day))
@@ -37,7 +37,7 @@ print(table(data$Treatment, data$Day))
 controls_data <- data[data$Treatment %in% c("Control1", "Control2"), ]
 controls_data$is_acetone <- ifelse(controls_data$Treatment == "Control2", 1, 0)
 
-acetone_model <- glm(SiO2 ~ Day + is_acetone, 
+acetone_model <- glm(AI ~ Day + is_acetone, 
                      data = controls_data, 
                      family = gaussian())
 
@@ -62,34 +62,34 @@ acetone_conc <- c(
 
 # Calculate expected acetone effect for each treatment based on concentration
 data$expected_acetone_effect <- (acetone_conc[data$Treatment] / 100) * acetone_effect_estimate
-data$acetone_adjusted_SiO2 <- data$SiO2 - data$expected_acetone_effect
+data$acetone_adjusted_AI <- data$AI - data$expected_acetone_effect
 
 
 
 # Step 3: Run analysis on acetone-adjusted responses
-treatment_model <- glm(acetone_adjusted_SiO2 ~ Day + Treatment + Acet_Est, 
+treatment_model <- glm(acetone_adjusted_AI ~ Day + Treatment + Acet_Est, 
                        data = data, 
                        family = gaussian())
 
 print(summary(treatment_model))
 
 # Calculate means and standard errors for original and adjusted CP ratios
-mean_SiO2 <- aggregate(SiO2 ~ Treatment + Day, data = data, 
+mean_AI <- aggregate(AI ~ Treatment + Day, data = data, 
                             FUN = function(x) c(mean = mean(x), se = sd(x)/sqrt(length(x))))
-mean_SiO2 <- do.call(data.frame, mean_SiO2)
-names(mean_SiO2)[3:4] <- c("mean_SiO2", "se_SiO2")
+mean_AI <- do.call(data.frame, mean_AI)
+names(mean_AI)[3:4] <- c("mean_AI", "se_AI")
 
-mean_adjusted <- aggregate(acetone_adjusted_SiO2 ~ Treatment + Day, data = data,
+mean_adjusted <- aggregate(acetone_adjusted_AI ~ Treatment + Day, data = data,
                            FUN = function(x) c(mean = mean(x), se = sd(x)/sqrt(length(x))))
 mean_adjusted <- do.call(data.frame, mean_adjusted)
 names(mean_adjusted)[3:4] <- c("mean_adjusted", "se_adjusted")
 
 # View the means
-print(head(mean_SiO2))
+print(head(mean_AI))
 print(head(mean_adjusted))
 
 # For plotting - ensure treatments are ordered correctly
-mean_SiO2$Treatment <- factor(mean_SiO2$Treatment, 
+mean_AI$Treatment <- factor(mean_AI$Treatment, 
                                    levels = c("Control1", "Control2", 
                                               "Treatment1", "Treatment2", 
                                               "Treatment3", "Treatment4", 
@@ -110,7 +110,7 @@ treatment_pch <- c(15, 16, 17, 18, 19, 20, 21)  # Different point symbols
 par(mfrow=c(2,1))
 
 # Function to create the plot with error bars
-create_treatment_plot <- function(data, y_var, se_var, y_label, mSiO2n_title) {
+create_treatment_plot <- function(data, y_var, se_var, y_label, mAIn_title) {
   # Get the unique treatments and days
   treatments <- levels(data$Treatment)
   days <- sort(unique(data$Day))
@@ -124,9 +124,9 @@ create_treatment_plot <- function(data, y_var, se_var, y_label, mSiO2n_title) {
   
   # Create empty plot with appropriate axes
   plot(NULL, xlim = range(days), ylim = c(y_min, y_max * 1.1),
-       xlab = "Day", ylab = y_label, mSiO2n = mSiO2n_title,
+       xlab = "Day", ylab = y_label, mAIn = mAIn_title,
        xaxt = "n", # we'll add custom x-axis
-       cex.lab = 1.2, cex.axis = 1.1, cex.mSiO2n = 1.3)
+       cex.lab = 1.2, cex.axis = 1.1, cex.mAIn = 1.3)
   
   # Add custom x-axis with only the specific days
   axis(1, at = days)
@@ -172,10 +172,10 @@ create_treatment_plot <- function(data, y_var, se_var, y_label, mSiO2n_title) {
 }
 
 # Plot 1: Original CP Ratio
-create_treatment_plot(mean_SiO2, "mean_SiO2", "se_SiO2", 
-                      "SiO2", "")
+create_treatment_plot(mean_AI, "mean_AI", "se_AI", 
+                      "AI", "")
 
 # Plot 2: Acetone-Adjusted CP Ratio
 create_treatment_plot(mean_adjusted, "mean_adjusted", "se_adjusted", 
-                      "Adjusted SiO2", "")
+                      "Adjusted AI", "")
 
