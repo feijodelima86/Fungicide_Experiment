@@ -68,7 +68,7 @@ controls_data$is_acetone <- ifelse(controls_data$Treatment == "Control2", 1, 0)
 # Try mixed model first, but fall back to simpler model if needed
 tryCatch({
   # Attempt to use linear mixed-effects model with random intercept for Sample
-  acetone_model <- lmer(SiO2 ~ Day + is_acetone + (1|Sample), 
+  acetone_model2 <- lmer(SiO2 ~ Day + is_acetone + (1|Sample), 
                         data = controls_data)
   
   # Extract the acetone effect from the mixed model
@@ -138,6 +138,8 @@ tryCatch({
   
   print(summary(treatment_model))
 })
+
+
 
 # Calculate means and standard errors for original and adjusted SiO2
 mean_SiO2 <- aggregate(SiO2 ~ Treatment + Day, data = data, 
@@ -244,3 +246,4 @@ create_treatment_plot(mean_SiO2, "mean_SiO2", "se_SiO2",
 # Plot 2: Acetone-Adjusted SiO2 values
 create_treatment_plot(mean_adjusted, "mean_adjusted", "se_adjusted", 
                       "Adjusted SiO2", "Acetone-Adjusted SiO2 Values")
+

@@ -1,5 +1,5 @@
 # Function to create plot with fungicide concentration on x-axis and days as different colors
-create_concentration_plot <- function(data, y_var, se_var, y_label, mSiO2n_title = "") {
+create_concentration_plot <- function(data, y_var, se_var, y_label, mAIn_title = "") {
   # Define colors for days - shades of blue from light to dark
   # Get unique days
   days <- sort(unique(data$Day))
@@ -46,10 +46,10 @@ create_concentration_plot <- function(data, y_var, se_var, y_label, mSiO2n_title
        ylim = c(y_min, y_max * 1.1),
        xlab = "Fungicide Concentration (%)", 
        ylab = y_label, 
-       mSiO2n = mSiO2n_title,
+       mAIn = mAIn_title,
        log = "x",  # Use log scale for x-axis
        xaxt = "n", # we'll add custom x-axis
-       cex.lab = 1.2, cex.axis = 1.1, cex.mSiO2n = 1.3)
+       cex.lab = 1.2, cex.axis = 1.1, cex.mAIn = 1.3)
   
   # Add custom x-axis with specific concentrations
   conc_for_axis <- c(0.001, 0.01, 0.1, 1, 10, 100)
@@ -107,9 +107,9 @@ create_concentration_plot <- function(data, y_var, se_var, y_label, mSiO2n_title
 par(mfrow=c(2,1))
 
 # Plot 1: Original CP Ratio
-create_concentration_plot(mean_SiO2, "mean_SiO2", "se_SiO2", 
-                          "SiO2")
+create_concentration_plot(mean_AI, "mean_AI", "se_AI", 
+                          "AI")
 
 # Plot 2: Acetone-Adjusted CP Ratio
 create_concentration_plot(mean_adjusted, "mean_adjusted", "se_adjusted", 
-                          "Adjusted SiO2")
+                          "Adjusted AI")

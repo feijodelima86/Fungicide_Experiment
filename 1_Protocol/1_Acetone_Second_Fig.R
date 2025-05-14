@@ -1,5 +1,5 @@
 # For plotting - ensure treatments are ordered correctly
-mean_N.P$Treatment <- factor(mean_N.P$Treatment, 
+mean_AI$Treatment <- factor(mean_AI$Treatment, 
                               levels = c("Control1", "Control2", 
                                          "Treatment1", "Treatment2", 
                                          "Treatment3", "Treatment4", 
@@ -18,7 +18,7 @@ treatment_pch <- c(15, 16, 17, 18, 19, 20, 21)  # Different point symbols
 par(mfrow=c(2,1))
 
 # Function to create the plot with error bars and selected treatments
-create_treatment_plot <- function(data, y_var, se_var, y_label, mN.Pn_title, selected_treatments) {
+create_treatment_plot <- function(data, y_var, se_var, y_label, mAIn_title, selected_treatments) {
   # Filter data for selected treatments only
   data_subset <- data[data$Treatment %in% selected_treatments, ]
   
@@ -35,9 +35,9 @@ create_treatment_plot <- function(data, y_var, se_var, y_label, mN.Pn_title, sel
   
   # Create empty plot with appropriate axes
   plot(NULL, xlim = range(days), ylim = c(y_min, y_max * 1.1),
-       xlab = "Day", ylab = y_label, mN.Pn = mN.Pn_title,
+       xlab = "Day", ylab = y_label, mAIn = mAIn_title,
        xaxt = "n", # we'll add custom x-axis
-       cex.lab = 1.2, cex.axis = 1.1, cex.mN.Pn = 1.3)
+       cex.lab = 1.2, cex.axis = 1.1, cex.mAIn = 1.3)
   
   # Add custom x-axis with only the specific days
   axis(1, at = days)
@@ -90,16 +90,16 @@ create_treatment_plot <- function(data, y_var, se_var, y_label, mN.Pn_title, sel
 }
 
 # Get all treatment names
-all_treatments <- levels(mean_N.P$Treatment)
+all_treatments <- levels(mean_AI$Treatment)
 
 # Plot 1: Control 1, 2 and treatment 7 (Control1, Control2, Treatment5)
 first_plot_treatments <- c("Control1", "Control2", "Treatment5")
-create_treatment_plot(mean_N.P, "mean_N.P", "se_N.P", 
-                      "N.P", "", 
+create_treatment_plot(mean_AI, "mean_AI", "se_AI", 
+                      "AI", "", 
                       first_plot_treatments)
 
 # Plot 2: Treatments 1-5 (Treatment1 through Treatment5)
 second_plot_treatments <- c("Treatment1", "Treatment2", "Treatment3", "Treatment4", "Treatment5")
 create_treatment_plot(mean_adjusted, "mean_adjusted", "se_adjusted", 
-                      "Adjusted N.P", "", 
+                      "Adjusted AI", "", 
                       second_plot_treatments)
