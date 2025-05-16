@@ -6,17 +6,15 @@ names(data)
 
 # Run the full analysis and store results
 
-results <- analyze_fungicide_effect(data, "AI", log_transform = T)
-
-plot_treatment_comparison(results)
-
-plot_selective_treatment_comparison(results)
-
-plot_concentration_response(results)
-
-plot_jittered_treatment_comparison(results)
-
-plot_jittered_concentration_response(results)
+results <- analyze_fungicide_effect(data, "Total.P", log_transform = F)
 
 plot_selective_treatment_comparison_alt(results)
+
+plot_fungicide_data(results)
+
+plot_significance_scorecards(results)
+
+plot_fungicide_analysis(results)
+
+names(data)
 
